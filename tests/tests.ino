@@ -1,8 +1,8 @@
 #include <Wire.h>
 
 void setup() {
-  Serial.begin(115200);
-  Serial.println("\nEscaneando dispositivos I2C...");
+  Serial.begin(9600);
+  Serial.println("Escaneando dispositivos I2C...");
 
   Wire.begin();
 }
