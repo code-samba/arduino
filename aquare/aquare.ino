@@ -15,7 +15,13 @@
 #define TFT_RST        9
 #define TFT_DC         8
 
-#define SERIAL_DEBUG   true          
+#define SERIAL_DEBUG   true    
+
+#define BMP_ERROR_LED 2
+#define BH1750_ERROR_LED 3
+
+int BMP_READY = true;
+int BH1750_READY = true;
 
 Adafruit_BMP280 bmp;
 
@@ -27,13 +33,20 @@ void setup(void) {
   Serial.begin(9600);
   Serial.println("Initializing...");
 
+  pinMode(BMP_ERROR_LED, OUTPUT);
+  pinMode(BH1750_ERROR_LED, OUTPUT);
+
   if (!bmp.begin(0x76)) {
     Serial.println("Não foi possivel localizar o sensor BMP 280");
+    BMP_READY = false;
   }
 
   if (!lightMeter.begin()) {
     Serial.println("Não foi possivel localizar o sensor BH 1750");
+    BH1750_READY = false;
   }
+
+  checkSensorError();
 
   tft.initR(INITR_BLACKTAB);
   Serial.println("Initialized");
@@ -42,7 +55,9 @@ void setup(void) {
 void loop() {
   tft.fillScreen(ST77XX_BLACK);
   drawText("{S}amba Code", ST77XX_MAGENTA, 1, 25, 150);
-  
+
+  checkSensorError();
+
   displaySensorData();
   
   if (SERIAL_DEBUG) {
@@ -64,45 +79,50 @@ void formatAndDraw(float value, const char* unit, uint16_t color, int textSize, 
 }
 
 void displaySensorData() {
-  float temperature = bmp.readTemperature();
-  float pressure = bmp.readPressure() / 1013.25F / 100.0F;
-  float altitude = bmp.readAltitude(1013.25);
-  uint16_t luminosity = lightMeter.readLightLevel();
+  if (BMP_READY) {
+    float temperature = bmp.readTemperature();
+    float pressure = bmp.readPressure() / 1013.25F / 100.0F;
+    float altitude = bmp.readAltitude(1013.25);
+    formatAndDraw(temperature, "C", ST77XX_WHITE, 2, 0, 0);
+    formatAndDraw(pressure, "atm", ST77XX_WHITE, 2, 0, 25);
+    formatAndDraw(altitude, "m", ST77XX_WHITE, 2, 0, 50);
+  }
 
-  formatAndDraw(temperature, "C", ST77XX_WHITE, 2, 0, 0);
-  formatAndDraw(pressure, "atm", ST77XX_WHITE, 2, 0, 25);
-  formatAndDraw(altitude, "m", ST77XX_WHITE, 2, 0, 50);
-
-  char luxBuffer[12];
-  snprintf(luxBuffer, sizeof(luxBuffer), "%ulux", luminosity);
-  drawText(luxBuffer, ST77XX_WHITE, 2, 0, 75);
+  if (BH1750_READY) {
+    uint16_t luminosity = lightMeter.readLightLevel();
+    char luxBuffer[12];
+    snprintf(luxBuffer, sizeof(luxBuffer), "%ulux", luminosity);
+    drawText(luxBuffer, ST77XX_WHITE, 2, 0, 75);
+  }
 }
 
-
-
 void debug() {
-  Serial.println("DEBUG BMP280");
+  if (BMP_READY) {
+    Serial.println("DEBUG BMP280");
+    Serial.print(F("Temperatura: "));
+    Serial.print(bmp.readTemperature());
+    Serial.println(" C");
+    Serial.print(F("Pressão: "));
+    Serial.print(bmp.readPressure() / 1013.25F / 100.0F);
+    Serial.println(" atm");
+    Serial.print(F("Altitude Aprox: "));
+    Serial.print(bmp.readAltitude(1013.25));
+    Serial.println(" m");
+    Serial.println();
+  } else {
+    Serial.println("Erro: BMP280 não detectado");
+  }
 
-  Serial.print(F("Temperatura: "));
-  Serial.print(bmp.readTemperature());
-  Serial.println(" C");
-
-  Serial.print(F("Pressão: "));
-  Serial.print(bmp.readPressure() / 1013.25F / 100.0F);
-  Serial.println(" atm");
-
-  Serial.print(F("Altitude Aprox: "));
-  Serial.print(bmp.readAltitude(1013.25));
-  Serial.println(" m");
-  Serial.println();
-
-  Serial.println("DEBUG BH1750");
-  uint16_t lux = lightMeter.readLightLevel();
-
-  Serial.print("Luminosidade: ");
-  Serial.print(lux);
-  Serial.println(" lux");
-  Serial.println();
+  if (BH1750_READY) {
+    Serial.println("DEBUG BH1750");
+    uint16_t lux = lightMeter.readLightLevel();
+    Serial.print("Luminosidade: ");
+    Serial.print(lux);
+    Serial.println(" lux");
+    Serial.println();
+  } else {
+    Serial.println("Erro: BH1750 não detectado");
+  }
 }
 
 void drawText(char *text, uint16_t color, int size, int x, int y) {
@@ -111,4 +131,40 @@ void drawText(char *text, uint16_t color, int size, int x, int y) {
   tft.setTextWrap(true);
   tft.setTextSize(size);
   tft.print(text);
+}
+
+void testSensors() {
+  float altitude = bmp.readAltitude(1013.25);
+  
+  if (isnan(altitude)) {
+    Serial.println("Erro de leitura do sensor BMP280");
+    BMP_READY = false;
+  } else {
+    BMP_READY = true;
+  }
+
+  uint16_t luminosity = lightMeter.readLightLevel();
+  
+  if (luminosity >= 65000) {
+    Serial.println("Erro de leitura do sensor BH1750");
+    BH1750_READY = false;
+  } else {
+    BH1750_READY = true;
+  }
+}
+
+void checkSensorError() {
+  testSensors();
+
+  if (BMP_READY == false) {
+    digitalWrite(BMP_ERROR_LED, HIGH);
+  } else {
+    digitalWrite(BMP_ERROR_LED, LOW);
+  }
+
+  if (BH1750_READY == false) {
+    digitalWrite(BH1750_ERROR_LED, HIGH);
+  } else {
+    digitalWrite(BH1750_ERROR_LED, LOW);
+  }
 }
