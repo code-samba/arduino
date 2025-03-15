@@ -17,11 +17,15 @@
 
 #define SERIAL_DEBUG   true    
 
-#define BMP_ERROR_LED 2
-#define BH1750_ERROR_LED 3
+#define BMP_ERROR_LED 7
+#define BH1750_ERROR_LED 6
+
+#define LAMP_PIN 5
 
 int BMP_READY = true;
 int BH1750_READY = true;
+
+bool LAMP_STATUS = false;
 
 Adafruit_BMP280 bmp;
 
@@ -35,6 +39,8 @@ void setup(void) {
 
   pinMode(BMP_ERROR_LED, OUTPUT);
   pinMode(BH1750_ERROR_LED, OUTPUT);
+
+  pinMode(LAMP_PIN, OUTPUT);
 
   if (!bmp.begin(0x76)) {
     Serial.println("Não foi possivel localizar o sensor BMP 280");
@@ -57,6 +63,7 @@ void loop() {
   drawText("{S}amba Code", ST77XX_MAGENTA, 1, 25, 150);
 
   checkSensorError();
+  checkLuminosity();
 
   displaySensorData();
   
@@ -93,6 +100,8 @@ void displaySensorData() {
     char luxBuffer[12];
     snprintf(luxBuffer, sizeof(luxBuffer), "%ulux", luminosity);
     drawText(luxBuffer, ST77XX_WHITE, 2, 0, 75);
+
+    drawText("Lampada", LAMP_STATUS ? ST77XX_GREEN : ST77XX_RED, 2, 0, 100);
   }
 }
 
@@ -119,6 +128,12 @@ void debug() {
     Serial.print("Luminosidade: ");
     Serial.print(lux);
     Serial.println(" lux");
+    Serial.println();
+
+
+    Serial.println("DEBUG LAMP STATUS");
+    Serial.print("Status da lampada: ");
+    Serial.println(LAMP_STATUS ? "Ligado" : "Desligado");
     Serial.println();
   } else {
     Serial.println("Erro: BH1750 não detectado");
@@ -166,5 +181,22 @@ void checkSensorError() {
     digitalWrite(BH1750_ERROR_LED, HIGH);
   } else {
     digitalWrite(BH1750_ERROR_LED, LOW);
+  }
+}
+
+void checkLuminosity() {
+  if (BH1750_READY) {
+    uint16_t luminosity = lightMeter.readLightLevel();
+    
+    if (luminosity <= 5) {
+      LAMP_STATUS = true;
+      digitalWrite(LAMP_PIN, HIGH);
+    } else {
+      LAMP_STATUS = false;
+      digitalWrite(LAMP_PIN, LOW);
+    }
+  } else {
+    LAMP_STATUS = false;
+    digitalWrite(LAMP_PIN, LOW);
   }
 }
