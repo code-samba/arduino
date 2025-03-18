@@ -1,4 +1,4 @@
-# Ecology - Arduino IOT
+# Ecology
 
 ## Bibliotecas
 No Arduino IDE, devem ser instaladas as seguintes bibliotecas:

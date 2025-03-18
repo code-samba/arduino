@@ -1,4 +1,4 @@
-# Aquare - Arduino IOT
+# Aquare
 
 ## Bibliotecas
 No Arduino IDE, devem ser instaladas as seguintes bibliotecas:
