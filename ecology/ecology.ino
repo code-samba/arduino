@@ -235,14 +235,14 @@ void checkLuminosity() {
     
     if (luminosity <= 5) {
       LAMP_STATUS = true;
-      digitalWrite(LAMP_PIN, HIGH);
+      digitalWrite(LAMP_PIN, LOW);
     } else {
       LAMP_STATUS = false;
-      digitalWrite(LAMP_PIN, LOW);
+      digitalWrite(LAMP_PIN, HIGH);
     }
   } else {
     LAMP_STATUS = false;
-    digitalWrite(LAMP_PIN, LOW);
+    digitalWrite(LAMP_PIN, HIGH);
   }
 }
 
@@ -250,13 +250,13 @@ void checkMoisture() {
   if (CSMS_READY) {
     if (analogRead(CSMS_PIN) >= 400) {
       BOMB_STATUS = true;
-      digitalWrite(BOMB_PIN, HIGH);
+      digitalWrite(BOMB_PIN, LOW);
     } else {
       BOMB_STATUS = false;
-      digitalWrite(BOMB_PIN, LOW);
+      digitalWrite(BOMB_PIN, HIGH);
     }
   } else {
     BOMB_STATUS = false;
-    digitalWrite(BOMB_PIN, LOW);
+    digitalWrite(BOMB_PIN, HIGH);
   }
 }
