@@ -22,8 +22,11 @@ try:
                     arduinoData[key] = float(value) if '.' in value or value.isdigit() else value
 
             print("Temperatura:", arduinoData.get("TEMP"), "°C")
+            print("Pressão Local (ATM):", arduinoData.get("PRESS"), "atm")
+            print("Altitude:", arduinoData.get("ALT"), "m")
             print("Luminosidade:", arduinoData.get("LUX"), "lux")
             print("Umidade:", arduinoData.get("UMIDADE"))
+            print("Calibragem:", arduinoData.get("POT"))
             print("Lâmpada ligada?", "Sim" if arduinoData.get("LAMP") == 1 else "Não")
             print("Bomba ligada?", "Sim" if arduinoData.get("BOMB") == 1 else "Não")
             print("-" * 40)
