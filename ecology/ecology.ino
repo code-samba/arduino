@@ -24,7 +24,7 @@
 #define BOMB_PIN 4
 #define CSMS_PIN A3
 
-#define MOISTURE_CALIBRATION 500
+#define POTENCIOMETER_PIN A0
 
 bool BMP_READY = true;
 bool BH1750_READY = true;
@@ -124,7 +124,7 @@ void displaySensorData() {
   if (CSMS_READY) {
     int16_t moisture = analogRead(CSMS_PIN);
     char moistureBuffer[20];
-    snprintf(moistureBuffer, sizeof(moistureBuffer), "Umidade (01): %u (%u)", moisture, MOISTURE_CALIBRATION);
+    snprintf(moistureBuffer, sizeof(moistureBuffer), "U (01): %u (%u)", moisture, analogRead(POTENCIOMETER_PIN));
     drawText(moistureBuffer, ST77XX_WHITE, 1, 0, 40);
   }
 
@@ -250,7 +250,7 @@ void checkLuminosity() {
 
 void checkMoisture() {
   if (CSMS_READY) {
-    if (analogRead(CSMS_PIN) >= MOISTURE_CALIBRATION) {
+    if (analogRead(CSMS_PIN) >= analogRead(POTENCIOMETER_PIN)) {
       BOMB_STATUS = true;
       digitalWrite(BOMB_PIN, LOW);
     } else {
