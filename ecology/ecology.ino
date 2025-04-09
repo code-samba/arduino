@@ -133,52 +133,41 @@ void displaySensorData() {
 }
 
 void debug() {
-  Serial.println("DEBUG BMP280");
   if (BMP_READY) {
-    Serial.print(F("Temperatura: "));
+    Serial.print("TEMP:");
     Serial.print(bmp.readTemperature());
-    Serial.println(" C");
-    Serial.print(F("Pressão: "));
+    Serial.print(",");
+
+    Serial.print("PRESS:");
     Serial.print(bmp.readPressure() / 1013.25F / 100.0F);
-    Serial.println(" atm");
-    Serial.print(F("Altitude Aprox: "));
+    Serial.print(",");
+
+    Serial.print("ALT:");
     Serial.print(bmp.readAltitude(1013.25));
-    Serial.println(" m");
-  } else {
-    Serial.println("Erro: BMP280 não detectado");
+    Serial.print(",");
   }
-  Serial.println();
 
-  Serial.println("DEBUG BH1750");
   if (BH1750_READY) {
-    uint16_t lux = lightMeter.readLightLevel();
-    Serial.print("Luminosidade: ");
-    Serial.print(lux);
-    Serial.println(" lux");
-    Serial.println();
-
-    Serial.println("DEBUG LAMP STATUS");
-    Serial.print("Status da lampada: ");
-    Serial.println(LAMP_STATUS ? "Ligado" : "Desligado");
-  } else {
-    Serial.println("Erro: BH1750 não detectado");
+    Serial.print("LUX:");
+    Serial.print(lightMeter.readLightLevel());
+    Serial.print(",");
   }
-  Serial.println();
 
-  Serial.println("DEBUG CSMS 01");
   if (CSMS_READY) {
-    uint16_t lux = lightMeter.readLightLevel();
-    Serial.print("Nivel de umidade: ");
-    Serial.println(analogRead(CSMS_PIN));
-    Serial.println();
-
-    Serial.println("DEBUG BOMB STATUS");
-    Serial.print("Status da bomba: ");
-    Serial.println(BOMB_STATUS ? "Ligado" : "Desligado");
-  } else {
-    Serial.println("Erro: CSMS 01 não detectado");
+    Serial.print("UMIDADE:");
+    Serial.print(analogRead(CSMS_PIN));
+    Serial.print(",");
+    Serial.print("POT:");
+    Serial.print(analogRead(POTENCIOMETER_PIN));
+    Serial.print(",");
   }
-  Serial.println();
+
+  Serial.print("LAMP:");
+  Serial.print(LAMP_STATUS ? 1 : 0);
+  Serial.print(",");
+
+  Serial.print("BOMB:");
+  Serial.println(BOMB_STATUS ? 1 : 0);
 }
 
 void drawText(char *text, uint16_t color, int size, int x, int y) {
