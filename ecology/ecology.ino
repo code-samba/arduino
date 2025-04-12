@@ -25,6 +25,7 @@
 #define CSMS_PIN A3
 
 #define POTENCIOMETER_PIN A0
+#define POTENCIOMETER_LUMINOSITY_PIN A1
 
 bool BMP_READY = true;
 bool BH1750_READY = true;
@@ -151,6 +152,9 @@ void debug() {
     Serial.print("luminosidade:");
     Serial.print(lightMeter.readLightLevel());
     Serial.print(",");
+    Serial.print("calibragemluminosidade:");
+    Serial.print(analogRead(POTENCIOMETER_LUMINOSITY_PIN));
+    Serial.print(","),
   }
 
   if (CSMS_READY) {
@@ -224,7 +228,7 @@ void checkLuminosity() {
   if (BH1750_READY) {
     uint16_t luminosity = lightMeter.readLightLevel();
     
-    if (luminosity <= 5) {
+    if (luminosity <= analogRead(POTENCIOMETER_LUMINOSITY_PIN)) {
       LAMP_STATUS = true;
       digitalWrite(LAMP_PIN, LOW);
     } else {
