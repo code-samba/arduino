@@ -134,39 +134,39 @@ void displaySensorData() {
 
 void debug() {
   if (BMP_READY) {
-    Serial.print("TEMP:");
+    Serial.print("temperatura:");
     Serial.print(bmp.readTemperature());
     Serial.print(",");
 
-    Serial.print("PRESS:");
+    Serial.print("pressao:");
     Serial.print(bmp.readPressure() / 1013.25F / 100.0F);
     Serial.print(",");
 
-    Serial.print("ALT:");
+    Serial.print("altitude:");
     Serial.print(bmp.readAltitude(1013.25));
     Serial.print(",");
   }
 
   if (BH1750_READY) {
-    Serial.print("LUX:");
+    Serial.print("luminosidade:");
     Serial.print(lightMeter.readLightLevel());
     Serial.print(",");
   }
 
   if (CSMS_READY) {
-    Serial.print("UMIDADE:");
+    Serial.print("umidade:");
     Serial.print(analogRead(CSMS_PIN));
     Serial.print(",");
-    Serial.print("POT:");
+    Serial.print("calibragem:");
     Serial.print(analogRead(POTENCIOMETER_PIN));
     Serial.print(",");
   }
 
-  Serial.print("LAMP:");
+  Serial.print("lampada:");
   Serial.print(LAMP_STATUS ? 1 : 0);
   Serial.print(",");
 
-  Serial.print("BOMB:");
+  Serial.print("bomba:");
   Serial.println(BOMB_STATUS ? 1 : 0);
 }
 
