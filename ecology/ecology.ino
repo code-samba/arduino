@@ -118,7 +118,7 @@ void displaySensorData() {
   if (BH1750_READY) {
     uint16_t luminosity = lightMeter.readLightLevel();
     char luxBuffer[25];
-    snprintf(luxBuffer, sizeof(luxBuffer), "Luminosidade: %ulux", luminosity);
+    snprintf(luxBuffer, sizeof(luxBuffer), "L: %ulux (%u)", luminosity, analogRead(POTENCIOMETER_LUMINOSITY_PIN));
     drawText(luxBuffer, ST77XX_WHITE, 1, 0, 30);
   }
 
@@ -154,7 +154,7 @@ void debug() {
     Serial.print(",");
     Serial.print("calibragemluminosidade:");
     Serial.print(analogRead(POTENCIOMETER_LUMINOSITY_PIN));
-    Serial.print(","),
+    Serial.print(",");
   }
 
   if (CSMS_READY) {
